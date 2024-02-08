@@ -2,10 +2,12 @@
   import svelteLogo from './assets/svelte.svg'
   import viteLogo from '/vite.svg'
   import Counter from './lib/Counter.svelte'
-
+  import { onMount } from 'svelte';
   
   let inputValue = '';
   let result = '';
+  let history = [];
+
   const numbers1 = [7, 8, 9];
   const numbers2 = [4, 5, 6];
   const numbers3 = [3, 2, 1];
@@ -18,6 +20,9 @@
   const handleCalculate = () => {
     try {
       result = eval(inputValue);
+      const operation = `${inputValue} = ${result}`;
+      const timestamp = new Date().toLocaleString(); 
+      history.push({ id: Date.now(), timestamp, operation, result });
     } catch (error) {
       result = 'Error';
     }
@@ -45,6 +50,15 @@
     }
   };
 
+  onMount(async () => {
+    const response = await fetch('http://localhost:5173/api/history');
+    const data = await response.json();
+    history = data;
+  });
+
+  const selectResult = (selectedResult) => {
+    inputValue = selectedResult.toString();
+  };
 </script>
 
 
@@ -168,6 +182,24 @@
       </div>
       </div>
       <div class="col-span-1 max-w-md mx-auto my-8 p-6 bg-gray-200 rounded-lg shadow-md">
+          <div class="history-container">
+            <p class="font-bold mb-2">Historial:</p>
+          </div>  
+          <div class="bg-black">  
+            <table class="text-white mx-auto">
+              <thead>
+                <tr> 
+                  <th>Fecha</th>
+                  <th>Operacion</th>
+                  <th>Resultado</th>
+                </tr>
+              </thead>
+              <tbody class="">
+              
+              </tbody>
+            </table>
+          </div>
+        
       </div>  
   </div>
   
